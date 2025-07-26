@@ -10,9 +10,14 @@
 #include "esp_lcd_panel_io_interface.h"
 #include "esp_lcd_panel_ops.h"
 
+#define HOR_RES 360
+#define VER_RES 360
 #define LCD_OPCODE_WRITE_CMD        (0x02ULL)
 #define LCD_OPCODE_READ_CMD         (0x0BULL)
 #define LCD_OPCODE_WRITE_COLOR      (0x32ULL)
+static uint16_t *swap_buf = NULL;
+
+
 
 static const st77916_lcd_init_cmd_t vendor_specific_init_new[] = {
   {0xF0, (uint8_t []){0x28}, 1, 0},
@@ -256,7 +261,7 @@ int QSPI_Init(void){
     .cs_gpio_num = ESP_PANEL_LCD_SPI_IO_CS,               
     .dc_gpio_num = -1,                  
     .spi_mode = ESP_PANEL_LCD_SPI_MODE,                      
-    .pclk_hz = 5 * 1000 * 1000,       
+    .pclk_hz = 40 * 1000 * 1000,       
     .trans_queue_depth = ESP_PANEL_LCD_SPI_TRANS_QUEUE_SZ,            
     .on_color_trans_done = NULL,                            
     .user_ctx = NULL,                   
@@ -341,6 +346,11 @@ int QSPI_Init(void){
 }
 
 void ST77916_Init() {
+  swap_buf = (uint16_t *)heap_caps_malloc(HOR_RES * VER_RES * sizeof(uint16_t), MALLOC_CAP_SPIRAM);
+  if (!swap_buf) {
+    Serial.println("Failed to allocate swap_buf in PSRAM!");
+    while (1) delay(1000);
+  }
   ST7701_Reset();
   pinMode(ESP_PANEL_LCD_SPI_IO_TE, OUTPUT);
   if(!QSPI_Init()){
@@ -348,25 +358,26 @@ void ST77916_Init() {
   }
 }
 
-void LCD_addWindow(uint16_t Xstart, uint16_t Ystart, uint16_t Xend, uint16_t Yend,uint16_t* color)
-{ 
-  uint32_t size = (Xend - Xstart +1 ) * (Yend - Ystart + 1);
-  for (size_t i = 0; i < size; i++) {
-    color[i] = (((color[i] >> 8) & 0xFF) | ((color[i] << 8) & 0xFF00));
-  }
-  // for (size_t i = 0; i < size; i++) {
-  //   color[i] = 0xFFFF;
-  // }
-  Xend = Xend + 1;      // esp_lcd_panel_draw_bitmap: x_end End index on x-axis (x_end not included)
-  Yend = Yend + 1;      // esp_lcd_panel_draw_bitmap: y_end End index on y-axis (y_end not included)
-  if (Xend > EXAMPLE_LCD_WIDTH)
-    Xend = EXAMPLE_LCD_WIDTH;
-  if (Yend > EXAMPLE_LCD_HEIGHT)
-    Yend = EXAMPLE_LCD_HEIGHT;
-    
-  // printf("Xstart = %d    Ystart = %d    Xend = %d    Yend = %d \r\n",Xstart, Ystart, Xend, Yend);
-  esp_lcd_panel_draw_bitmap(panel_handle, Xstart, Ystart, Xend, Yend, color);                     // x_end End index on x-axis (x_end not included)
+void LCD_addWindow(uint16_t Xstart, uint16_t Ystart, uint16_t Xend, uint16_t Yend, uint16_t* color)
+{
+    Serial.printf("LCD_addWindow: Area %dx%d\n", (Xend - Xstart + 1), (Yend - Ystart + 1));
+
+    uint32_t size = (Xend - Xstart + 1) * (Yend - Ystart + 1);
+
+    // Swap into swap_buf, do NOT swap in-place!
+    for (size_t i = 0; i < size; i++) {
+        swap_buf[i] = ((color[i] >> 8) & 0xFF) | ((color[i] << 8) & 0xFF00);
+    }
+
+    Xend = Xend + 1;
+    Yend = Yend + 1;
+    if (Xend > HOR_RES)  Xend = HOR_RES;
+    if (Yend > VER_RES)  Yend = VER_RES;
+
+    esp_lcd_panel_draw_bitmap(panel_handle, Xstart, Ystart, Xend, Yend, swap_buf);
 }
+
+
 
 
 uint8_t LCD_Backlight = 50;

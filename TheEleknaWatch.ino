@@ -39,8 +39,7 @@ void setup() {
 
 void loop() {
     Touch_Loop();      
-    Lvgl_Loop();       
-    delay(5);
+    Lvgl_Loop();
 }
 
 
