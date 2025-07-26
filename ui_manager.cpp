@@ -12,6 +12,8 @@ void ui_init() {
 
   current = Screen::Home;
   lv_scr_load(screens[int(current)]);
+
+  start_screen_enable_wifi_auto_update();
 }
 
 void ui_show(Screen s) {
@@ -27,7 +29,7 @@ void ui_handle_gesture(GESTURE g) {
             current = Screen((int(current) + 1) % int(Screen::Count));
             lv_scr_load_anim(screens[int(current)],
                              LV_SCR_LOAD_ANIM_MOVE_LEFT, 
-                             300,                        
+                             150,                        
                              0,                          
                              false);                     
             break;
@@ -37,7 +39,7 @@ void ui_handle_gesture(GESTURE g) {
             current = Screen((int(current) + int(Screen::Count) - 1) % int(Screen::Count));
             lv_scr_load_anim(screens[int(current)],
                              LV_SCR_LOAD_ANIM_MOVE_RIGHT,
-                             300,
+                             150,
                              0,
                              false);
             break;
