@@ -3,6 +3,6 @@
 
 #include <lvgl.h>
 
-lv_obj_t * clock_screen_create();
+lv_obj_t * clock_screen_create(void);
 
 #endif // CLOCK_SCREEN_H

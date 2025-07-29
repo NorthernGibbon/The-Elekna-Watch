@@ -1,5 +1,6 @@
 #include "Touch_CST816.h"
 #include "ui_manager.h"
+#include "esp_heap_caps.h"
 
 struct CST816_Touch touch_data = {0};
 uint8_t Touch_interrupts=0;
@@ -45,6 +46,8 @@ void ARDUINO_ISR_ATTR Touch_CST816_ISR(void) {
 uint8_t Touch_Init(void) {
   Wire1.begin(CST816_SDA_PIN, CST816_SCL_PIN, I2C_MASTER_FREQ_HZ);
   CST816_Touch_Reset();
+  Serial.printf("PSRAM: %d bytes free before LVGL buffer\n", ESP.getFreePsram());
+  Serial.printf("HEAP: %d bytes free before LVGL buffer\n", ESP.getFreeHeap());
   uint16_t Verification = CST816_Read_cfg();
   CST816_AutoSleep(true);
    
@@ -65,7 +68,6 @@ uint8_t CST816_Touch_Reset(void)
 }
 
 uint16_t CST816_Read_cfg(void) {
-
   uint8_t buf[3];
   I2C_Read_Touch(CST816_ADDR, CST816_REG_Version,buf, 1);
   printf("TouchPad_Version:0x%02x\r\n", buf[0]);
@@ -109,7 +111,6 @@ uint8_t Touch_Read_Data(void) {
   }
   return true;
 }
-
 
 void example_touchpad_read(void) {
   Touch_Read_Data();

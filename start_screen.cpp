@@ -2,9 +2,11 @@
 #include <lvgl.h>
 #include <WiFi.h>
 #include "wifi_manager.h"
+#include "bluetooth_manager.h"
 
 static lv_obj_t *wifi_lbl = NULL;
 static lv_obj_t *ip_lbl = NULL;
+static lv_obj_t *ble_lbl = NULL;
 
 lv_obj_t * start_screen_create(void) {
     lv_obj_t * scr = lv_obj_create(NULL);
@@ -14,16 +16,31 @@ lv_obj_t * start_screen_create(void) {
     lv_label_set_text(top_lbl, "-- The Elekna Watch --");
     lv_obj_align(top_lbl, LV_ALIGN_TOP_MID, 0, 50);
 
+    // IP address label
+    ip_lbl = lv_label_create(scr);
+    lv_label_set_text(ip_lbl, "IP: ...");
+    lv_obj_align(ip_lbl, LV_ALIGN_CENTER, 0, 0);
+
     // WiFi Status Label/Icon
     wifi_lbl = lv_label_create(scr);
     update_wifi_status_label(); // Set initial status
     lv_obj_align(wifi_lbl, LV_ALIGN_CENTER, 0, 20);
 
-    ip_lbl = lv_label_create(scr);
-    lv_label_set_text(ip_lbl, "IP: ...");
-    lv_obj_align(ip_lbl, LV_ALIGN_CENTER, 0, 0);
+    // Bluetooth status label
+    ble_lbl = lv_label_create(scr);
+    lv_label_set_text(ble_lbl, LV_SYMBOL_BLUETOOTH " Not Connected");
+    lv_obj_align(ble_lbl, LV_ALIGN_CENTER, 0, 40);
 
     return scr;
+}
+
+void update_bluetooth_status_label() {
+    if (!ble_lbl) return;
+    if (bluetooth_is_connected()) {
+        lv_label_set_text_fmt(ble_lbl, "%s Connected", LV_SYMBOL_BLUETOOTH);
+    } else {
+        lv_label_set_text_fmt(ble_lbl, "%s Not Connected", LV_SYMBOL_BLUETOOTH);
+    }
 }
 
 void update_wifi_status_label() {
@@ -58,9 +75,15 @@ void update_wifi_status_label() {
 static void wifi_status_timer_cb(lv_timer_t * timer)
 {
     update_wifi_status_label();
+    update_bluetooth_status_label();
 }
 
 void start_screen_enable_wifi_auto_update()
 {
     lv_timer_create(wifi_status_timer_cb, 1000, NULL); 
+}
+
+void start_screen_enable_ble_auto_update()
+{
+    lv_timer_create([](lv_timer_t*){ update_bluetooth_status_label(); }, 1000, NULL);
 }

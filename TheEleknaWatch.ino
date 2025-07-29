@@ -11,6 +11,7 @@
 #include "ui_manager.h"
 #include "Wireless.h"
 #include "wifi_manager.h"
+#include "bluetooth_manager.h"
 
 #define TP_SDA_PIN  1
 #define TP_SCL_PIN  3
@@ -20,31 +21,31 @@ const char* ssid = "NETGEAR44";
 const char* password = "gentlefire780";
 
 void scan_wifi() {
-    WiFi.mode(WIFI_STA);
-    int n = WiFi.scanNetworks();
-    Serial.println("Scan done");
-    if (n == 0) Serial.println("No networks found");
-    else {
-      for (int i = 0; i < n; ++i) {
-        Serial.print(i + 1);
-        Serial.print(": ");
-        Serial.println(WiFi.SSID(i));
-      }
+  WiFi.mode(WIFI_STA);
+  int n = WiFi.scanNetworks();
+  Serial.println("Scan done");
+  if (n == 0) Serial.println("No networks found");
+  else {
+    for (int i = 0; i < n; ++i) {
+      Serial.print(i + 1);
+      Serial.print(": ");
+      Serial.println(WiFi.SSID(i));
     }
+  }
 }
 
 // ─── SETUP & LOOP ──────────────────────────────────────────────────────────────
 void setup() {
   Serial.begin(115200);
+
   scan_wifi();
 
-  // Required by the I2C driver and TCA9554PWR
   pinMode(I2C_SDA_PIN, INPUT_PULLUP);
   pinMode(I2C_SCL_PIN, INPUT_PULLUP);
   Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN);
   Wire.setClock(100000);
   
-  delay(100);  // let USB-Serial wake up
+  delay(100); 
 
   TCA9554PWR_Init();
   Backlight_Init();
@@ -56,14 +57,22 @@ void setup() {
 
   wifi_manager_connect(ssid, password);
   wifi_manager_get_status();
-  // — Init your RTC chip —
+  bluetooth_init();
+
   PCF85063_Init();
 }
 
 void loop() {
     Touch_Loop();      
     Lvgl_Loop();
+
+    #if defined(ESP32)
+    if (psramFound()) {
+        Serial.println("PSRAM found!");
+        Serial.printf("Free PSRAM: %d bytes\n", ESP.getFreePsram());
+    } else {
+        Serial.println("PSRAM NOT FOUND!");
+        while (1) delay(1000);
+    }
+  #endif
 }
-
-
-

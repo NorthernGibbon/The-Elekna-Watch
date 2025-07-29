@@ -23,30 +23,24 @@ void ui_show(Screen s) {
 }
 
 void ui_handle_gesture(GESTURE g) {
-    switch (g) {
-        case SWIPE_LEFT:
-            // Next screen
-            current = Screen((int(current) + 1) % int(Screen::Count));
-            lv_scr_load_anim(screens[int(current)],
-                             LV_SCR_LOAD_ANIM_MOVE_LEFT, 
-                             150,                        
-                             0,                          
-                             false);                     
-            break;
+  switch(g) {
+    case SWIPE_LEFT:
+      current = Screen((int(current) + 1) % int(Screen::Count));
+      ui_show(current);
+      break;
 
-        case SWIPE_RIGHT:
-            // Previous screen
-            current = Screen((int(current) + int(Screen::Count) - 1) % int(Screen::Count));
-            lv_scr_load_anim(screens[int(current)],
-                             LV_SCR_LOAD_ANIM_MOVE_RIGHT,
-                             150,
-                             0,
-                             false);
-            break;
+    case SWIPE_RIGHT:
+      current = Screen((int(current) + int(Screen::Count) - 1) % int(Screen::Count));
+      ui_show(current);
+      break;
+      
+    default:
+      // you can handle SWIPE_UP, SWIPE_DOWN, CLICK, etc. here too
+      break;
 
-        default:
-            // Handle SWIPE_UP, SWIPE_DOWN, CLICK, etc. here if you want
-            break;
-    }
+
+  }
+
+
 }
 

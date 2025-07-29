@@ -1,14 +1,13 @@
 #include "LVGL_Driver.h"
 #include "RTC_PCF85063.h"    // your RTC driver
 #include <string.h>          // for memset
-#include "esp_heap_caps.h" // Required for heap_caps_malloc
 #include <Arduino.h>
+#include "esp_heap_caps.h"
 
 #define HOR_RES            360
 #define VER_RES            360
-#define LVGL_BUF_PIXELS    (HOR_RES * VER_RES)
+#define LVGL_BUF_PIXELS    (HOR_RES * 20)
 #define LVGL_BUF_SIZE      (LVGL_BUF_PIXELS * sizeof(lv_color_t))
-
 
 static lv_color_t *buf1 = NULL;
 static lv_color_t *buf2 = NULL;
@@ -41,6 +40,13 @@ void example_increase_lvgl_tick(void *arg)
     lv_tick_inc(EXAMPLE_LVGL_TICK_PERIOD_MS);
 }
 
+void print_psram_stats(const char *tag) {
+    size_t total   = heap_caps_get_free_size(MALLOC_CAP_SPIRAM);
+    size_t largest = heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM);
+    Serial.printf("%s → PSRAM free: %u  largest block: %u\n",
+                  tag, uint32_t(total), uint32_t(largest));
+}
+
 void Lvgl_Init(void)
 {
     lv_init();
@@ -49,18 +55,20 @@ void Lvgl_Init(void)
     lv_display_t * disp = lv_display_create(HOR_RES, VER_RES);
     lv_display_set_flush_cb(disp, Lvgl_Display_LCD);
 
-    // --- Full screen double buffer in PSRAM ---
-    buf1 = (lv_color_t *)heap_caps_malloc(LVGL_BUF_SIZE, MALLOC_CAP_SPIRAM);
-    buf2 = (lv_color_t *)heap_caps_malloc(LVGL_BUF_SIZE, MALLOC_CAP_SPIRAM);
+    Serial.printf("Before buffer: PSRAM free: %d Heap free: %d\n", ESP.getFreePsram(), ESP.getFreeHeap());
+
+    buf1 = (lv_color_t *)heap_caps_malloc(LVGL_BUF_SIZE,
+                                          MALLOC_CAP_SPIRAM|MALLOC_CAP_8BIT);
+    buf2 = (lv_color_t *)heap_caps_malloc(LVGL_BUF_SIZE,
+                                          MALLOC_CAP_SPIRAM|MALLOC_CAP_8BIT);
+
+    Serial.printf("After buffer: PSRAM free: %d Heap free: %d\n", ESP.getFreePsram(), ESP.getFreeHeap());
     if (!buf1 || !buf2) {
-        Serial.println("Full buffer allocation failed! Using small fallback buffers.");
-        static lv_color_t fallback_buf1[HOR_RES * 10];
-        static lv_color_t fallback_buf2[HOR_RES * 10];
-        buf1 = fallback_buf1;
-        buf2 = fallback_buf2;
-        lv_display_set_buffers(disp, buf1, buf2, sizeof(fallback_buf1), LV_DISPLAY_RENDER_MODE_FULL);
+    Serial.println("PSRAM allocation failed! System will halt.");
+    while (1) delay(1000);
     } else {
-        lv_display_set_buffers(disp, buf1, buf2, LVGL_BUF_SIZE, LV_DISPLAY_RENDER_MODE_FULL);
+      lv_display_set_buffers(disp, buf1, buf2, LVGL_BUF_SIZE,
+      LV_DISPLAY_RENDER_MODE_PARTIAL);
     }
 
     /*–– Touch input ––*/

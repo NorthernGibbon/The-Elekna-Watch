@@ -11,4 +11,8 @@ void update_wifi_status_label(void);
 // Enable automatic updating of the WiFi label with a timer
 void start_screen_enable_wifi_auto_update(void);
 
+void update_bluetooth_status_label(void);
+
+void start_screen_enable_ble_auto_update(void);
+
 #endif // START_SCREEN_H
