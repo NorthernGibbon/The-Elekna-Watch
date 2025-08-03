@@ -5,9 +5,6 @@
 struct CST816_Touch touch_data = {0};
 uint8_t Touch_interrupts=0;
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// I2C
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool I2C_Read_Touch(uint16_t Driver_addr, uint8_t Reg_addr, uint8_t *Reg_data, uint32_t Length)
 {
   Wire1.beginTransmission(Driver_addr);
@@ -37,7 +34,7 @@ bool I2C_Write_Touch(uint8_t Driver_addr, uint8_t Reg_addr, const uint8_t *Reg_d
   return true;
 }
 /*!
-    @brief  handle interrupts
+    @brief  
 */
 void ARDUINO_ISR_ATTR Touch_CST816_ISR(void) {
   Touch_interrupts = true;
@@ -57,7 +54,6 @@ uint8_t Touch_Init(void) {
   return true;
 }
 
-/* Reset controller */
 uint8_t CST816_Touch_Reset(void)
 {
   Set_EXIO(EXIO_PIN1,Low);
@@ -78,7 +74,7 @@ uint16_t CST816_Read_cfg(void) {
 }
 
 /*!
-    @brief  Fall asleep automatically
+    @brief
 */
 void CST816_AutoSleep(bool Sleep_State) {
   CST816_Touch_Reset();
@@ -87,12 +83,10 @@ void CST816_AutoSleep(bool Sleep_State) {
   I2C_Write_Touch(CST816_ADDR, CST816_REG_DisAutoSleep, &Sleep_State_Set, 1);
 }
 
-// reads sensor and touches
-// updates Touch Points
 uint8_t Touch_Read_Data(void) {
   uint8_t buf[6];
-  touch_data.gesture = NONE;  // Reset before reading
-  touch_data.points  = 0;     // Reset touch points
+  touch_data.gesture = NONE;
+  touch_data.points  = 0;
 
   I2C_Read_Touch(CST816_ADDR, CST816_REG_GestureID, buf, 6);
 
@@ -136,7 +130,7 @@ void Touch_Loop(void) {
 }
 
 /*!
-    @brief  get the gesture event name
+    @brief
 */
 String Touch_GestureName(void) {
   switch (touch_data.gesture) {

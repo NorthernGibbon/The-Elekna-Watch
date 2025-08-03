@@ -4,5 +4,6 @@
 #include <lvgl.h>
 
 lv_obj_t * clock_screen_create(void);
+void clock_screen_update();
 
 #endif // CLOCK_SCREEN_H

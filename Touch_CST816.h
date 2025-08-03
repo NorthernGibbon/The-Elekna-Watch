@@ -7,12 +7,11 @@
 #define CST816_SDA_PIN        1
 #define CST816_SCL_PIN        3
 #define CST816_INT_PIN        4
-#define CST816_RST_PIN        -1                      // EXIO1
-#define I2C_MASTER_FREQ_HZ    400000                     /*!< I2C master clock frequency */
+#define CST816_RST_PIN        -1                    
+#define I2C_MASTER_FREQ_HZ    400000                   
 
 
 #define CST816_LCD_TOUCH_MAX_POINTS             (1)    
-/* CST816 GESTURE */
 enum GESTURE {
   NONE = 0x00,
   SWIPE_UP = 0x01,
@@ -24,8 +23,6 @@ enum GESTURE {
   LONG_PRESS = 0x0C
 };
 
-//debug info
-/****************HYN_REG_MUT_DEBUG_INFO_MODE address start***********/
 #define CST816_REG_GestureID      0x01
 #define CST816_REG_Version        0x15
 #define CST816_REG_ChipID         0xA7

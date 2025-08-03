@@ -20,7 +20,7 @@ class MyServerCallbacks: public BLEServerCallbacks {
     void onDisconnect(BLEServer* pServer) override {
         deviceConnected = false;
         Serial.println("BLE Device disconnected!");
-        pServer->getAdvertising()->start(); // Restart advertising
+        pServer->getAdvertising()->start();
     }
 };
 
@@ -49,7 +49,7 @@ bool bluetooth_is_connected(void) {
 
 void bluetooth_notify(const String& msg) {
     if (deviceConnected && pCharacteristic) {
-        pCharacteristic->setValue(msg); // now correct type
+        pCharacteristic->setValue(msg); 
         pCharacteristic->notify();
         Serial.println("Notification sent via BLE: " + msg);
     }

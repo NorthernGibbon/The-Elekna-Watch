@@ -6,7 +6,6 @@ static lv_obj_t * screens[int(Screen::Count)];
 static Screen      current = Screen::Home;
 
 void ui_init() {
-  // create both screens
   screens[int(Screen::Home)]  = start_screen_create();
   screens[int(Screen::Clock)] = clock_screen_create();
 
@@ -35,12 +34,7 @@ void ui_handle_gesture(GESTURE g) {
       break;
       
     default:
-      // you can handle SWIPE_UP, SWIPE_DOWN, CLICK, etc. here too
       break;
-
-
   }
-
-
 }
 

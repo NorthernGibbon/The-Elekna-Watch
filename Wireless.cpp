@@ -8,10 +8,8 @@ bool Scan_finish = 0;
 int wifi_scan_number()
 {
   printf("/**********WiFi Test**********/\r\n");
-  // Set WiFi to station mode and disconnect from an AP if it was previously connected.
   WiFi.mode(WIFI_STA);                           
   WiFi.setSleep(true);     
-  // WiFi.scanNetworks will return the number of networks found.
   int count = WiFi.scanNetworks();
   if (count == 0)
   {
@@ -21,7 +19,6 @@ int wifi_scan_number()
     printf("Scanned %d Wi-Fi devices\r\n",count);
   }
   
-  // Delete the scan result to free memory for code below.
   WiFi.disconnect(true);
   WiFi.scanDelete();
   WiFi.mode(WIFI_OFF);  
@@ -52,15 +49,13 @@ int ble_scan_number()
   printf("/**********BLE Test Over**********/\r\n\r\n");
   return count;
 }
-extern char buffer[128];    /* Make sure buffer is enough for `sprintf` */
-void Wireless_Test1(){
-  // BLE_NUM = ble_scan_number();                       // !!! Please note that continuing to use Bluetooth will result in allocation failure due to RAM usage, so pay attention to RAM usage when Bluetooth is turned on
+extern char buffer[128];   
+void Wireless_Test1(){                    
   WIFI_NUM = wifi_scan_number();
   Scan_finish = 1;
 }
 
-void WirelessScanTask(void *parameter) {
-  // BLE_NUM = ble_scan_number();                       // !!! Please note that continuing to use Bluetooth will result in allocation failure due to RAM usage, so pay attention to RAM usage when Bluetooth is turned on
+void WirelessScanTask(void *parameter) {                  
   WIFI_NUM = wifi_scan_number();
   Scan_finish = 1;
   vTaskDelay(pdMS_TO_TICKS(1000));
