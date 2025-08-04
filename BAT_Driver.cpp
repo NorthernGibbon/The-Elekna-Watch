@@ -1,16 +1,23 @@
 #include "BAT_Driver.h"
 
-float BAT_analogVolts = 0;
-
 void BAT_Init(void)
 {
-  //set the resolution to 12 bits (0-4095)
-  analogReadResolution(12);
+    analogReadResolution(12);
 }
+
 float BAT_Get_Volts(void)
 {
-  int Volts = analogReadMilliVolts(BAT_ADC_PIN); // millivolts
-  BAT_analogVolts = (float)(Volts * 3.0 / 1000.0) / Measurement_offset;
-  // printf("BAT voltage : %.2f V\r\n", BAT_analogVolts);
-  return BAT_analogVolts;
+    int raw = analogRead(BAT_ADC_PIN);
+    float volts = (raw / 4095.0f) * 3.3f;
+    return volts / Measurement_offset;
+}
+
+float BAT_Get_Percent(void)
+{
+    float v = BAT_Get_Volts();
+    const float Vmin = 3.00f, Vmax = 4.20f;
+    float pct = (v - Vmin) / (Vmax - Vmin) * 100.0f;
+    if (pct < 0)   pct = 0;
+    if (pct > 100) pct = 100;
+    return pct;
 }

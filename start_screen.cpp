@@ -3,66 +3,90 @@
 #include <WiFi.h>
 #include "wifi_manager.h"
 #include "bluetooth_manager.h"
+#include "BAT_Driver.h"
+#include "start_bg.h"
 
 static lv_obj_t *wifi_lbl = NULL;
 static lv_obj_t *ip_lbl = NULL;
 static lv_obj_t *ble_lbl = NULL;
+static lv_obj_t *battery_lbl = NULL;
 
 static lv_style_t *style_wifi;
 static lv_style_t *style_ble;
 
 lv_obj_t * start_screen_create(void) {
-    lv_obj_t * scr = lv_obj_create(NULL);
+  lv_obj_t * scr = lv_obj_create(NULL);
 
-    // Background color and opacity (Maybe i need to create a global style for each screen but this works)
-    lv_obj_set_style_bg_opa(scr, LV_OPA_100, 0);
-    lv_obj_set_style_bg_color(scr, lv_color_black(), 0);
+  // Background image
+  static lv_style_t bg_style;
+  lv_style_init(&bg_style);
+  lv_style_set_bg_image_src(&bg_style, &start_bg);
+  lv_style_set_bg_image_opa(&bg_style, LV_OPA_COVER);
+  lv_style_set_bg_opa(&bg_style, LV_OPA_COVER);
+  lv_obj_add_style(scr, &bg_style, 0);
 
-    // Style and init of top label
-    static lv_style_t top_lbl_style;
-    lv_style_init(&top_lbl_style);
-    lv_style_set_text_color(&top_lbl_style, lv_color_white());
-    lv_style_set_text_font(&top_lbl_style, LV_FONT_DEFAULT);
+  // Style and init of top label
+  static lv_style_t top_lbl_style;
+  lv_style_init(&top_lbl_style);
+  lv_style_set_text_color(&top_lbl_style, lv_color_white());
+  lv_style_set_text_font(&top_lbl_style, &lv_font_montserrat_22);
 
-    lv_obj_t * top_lbl = lv_label_create(scr);
-    lv_obj_add_style(top_lbl, &top_lbl_style, LV_PART_MAIN);
-    lv_label_set_text(top_lbl, "-- The Elekna Watch --");
-    lv_obj_align(top_lbl, LV_ALIGN_TOP_MID, 0, 50);
+  lv_obj_t * top_lbl = lv_label_create(scr);
+  lv_obj_add_style(top_lbl, &top_lbl_style, LV_PART_MAIN);
+  lv_label_set_text(top_lbl, "ELEKNA");
+  lv_obj_align(top_lbl, LV_ALIGN_TOP_MID, 0, 50);
 
-    // Style and init of ip label
-    static lv_style_t ip_style;
-    lv_style_init(&ip_style);
-    lv_style_set_text_color(&ip_style, lv_color_white());
-    lv_style_set_text_font(&ip_style, LV_FONT_DEFAULT);
+  // Style and init of ip label
+  static lv_style_t ip_style;
+  lv_style_init(&ip_style);
+  lv_style_set_text_color(&ip_style, lv_color_white());
+  lv_style_set_text_font(&ip_style, LV_FONT_DEFAULT);
 
-    ip_lbl = lv_label_create(scr);
-    lv_obj_add_style(ip_lbl, &ip_style, LV_PART_MAIN);
-    lv_label_set_text(ip_lbl, "IP: ...");
-    lv_obj_align(ip_lbl, LV_ALIGN_CENTER, 0, 0);
+  ip_lbl = lv_label_create(scr);
+  lv_obj_add_style(ip_lbl, &ip_style, LV_PART_MAIN);
+  lv_label_set_text(ip_lbl, "IP: ...");
+  lv_obj_align(ip_lbl, LV_ALIGN_LEFT_MID, 40, -30);
 
-    // Style and init of wifi label
-    static lv_style_t wifi_style;
-    lv_style_init(&wifi_style);
-    lv_style_set_text_color(&wifi_style, lv_color_white());
-    lv_style_set_text_font(&wifi_style, LV_FONT_DEFAULT);
+  // Style and init of wifi label
+  static lv_style_t wifi_style;
+  lv_style_init(&wifi_style);
+  lv_style_set_text_color(&wifi_style, lv_color_white());
+  lv_style_set_text_font(&wifi_style, LV_FONT_DEFAULT);
 
-    wifi_lbl = lv_label_create(scr);
-    update_wifi_status_label(); 
-    lv_obj_add_style(wifi_lbl, &wifi_style, LV_PART_MAIN);
-    lv_obj_align(wifi_lbl, LV_ALIGN_CENTER, 0, 20);
+  wifi_lbl = lv_label_create(scr);
+  update_wifi_status_label(); 
+  lv_obj_add_style(wifi_lbl, &wifi_style, LV_PART_MAIN);
+  lv_obj_align(wifi_lbl, LV_ALIGN_LEFT_MID, 40, 0);
 
-    // Style and init of ble label
-    static lv_style_t ble_style;
-    lv_style_init(&ble_style);
-    lv_style_set_text_color(&ble_style, lv_color_white());
-    lv_style_set_text_font(&ble_style, LV_FONT_DEFAULT);
+  // Style and init of ble label
+  /*
+  static lv_style_t ble_style;
+  lv_style_init(&ble_style);
+  lv_style_set_text_color(&ble_style, lv_color_white());
+  lv_style_set_text_font(&ble_style, LV_FONT_DEFAULT);
 
-    ble_lbl = lv_label_create(scr);
-    lv_obj_add_style(ble_lbl, &ble_style, LV_PART_MAIN);
-    lv_label_set_text(ble_lbl, LV_SYMBOL_BLUETOOTH " Not Connected");
-    lv_obj_align(ble_lbl, LV_ALIGN_CENTER, 0, 40);
+  ble_lbl = lv_label_create(scr);
+  lv_obj_add_style(ble_lbl, &ble_style, LV_PART_MAIN);
+  lv_label_set_text(ble_lbl, LV_SYMBOL_BLUETOOTH " Not Connected");
+  lv_obj_align(ble_lbl, LV_ALIGN_CENTER, 0, 40);
+  */
 
-    return scr;
+  // Style and init of battery label
+  static lv_style_t bat_style;
+  lv_style_init(&bat_style);
+  lv_style_set_text_color(&bat_style, lv_color_white());
+  lv_style_set_text_font(&bat_style, LV_FONT_DEFAULT);
+
+  battery_lbl = lv_label_create(scr);
+  lv_obj_add_style(battery_lbl, &bat_style, LV_PART_MAIN);
+
+  int pct = (int)(BAT_Get_Percent() + 0.5f);
+  lv_label_set_text_fmt(battery_lbl, "%s %d%%",
+      LV_SYMBOL_BATTERY_FULL, pct);
+  lv_obj_align(battery_lbl, LV_ALIGN_LEFT_MID, 40, 30);
+
+
+  return scr;
 }
 
 void update_bluetooth_status_label() {
@@ -107,6 +131,11 @@ static void wifi_status_timer_cb(lv_timer_t * timer)
 {
     update_wifi_status_label();
     update_bluetooth_status_label();
+
+    if(battery_lbl) {
+      int pct = (int)(BAT_Get_Percent() + 0.5f);
+      lv_label_set_text_fmt(battery_lbl, "%d%%", pct);
+    }
 }
 
 void start_screen_enable_wifi_auto_update()
