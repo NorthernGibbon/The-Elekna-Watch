@@ -24,8 +24,8 @@
 static volatile bool rtc_tick = false;
 
 // WIFI config
-const char* ssid = "NETGEAR44";
-const char* password = "gentlefire780";
+const char* ssid = "REPLACE WITH WIFI SSID";
+const char* password = "REPLACE WITH WIFI PASSWORD";
 
 // RTC
 static void IRAM_ATTR rtc_isr_handler(void* arg) {
