@@ -1,4 +1,4 @@
-# The-Elekna-Watch
+# The EleknaWatch
 
 Project created specifically for the Waveshare ESP32-S3-Touch-LCD-1.85
 The demo project they provided never worked so adjusted some of the code for the drivers for display and lvgl.
