@@ -73,3 +73,7 @@ void StepCounter_StartTask(void) {
 uint32_t StepCounter_GetSteps(void) {
     return step_count;
 }
+
+void StepCounter_SetSteps(uint32_t steps) {
+    step_count = steps;
+}

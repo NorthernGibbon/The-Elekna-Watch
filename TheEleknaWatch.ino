@@ -19,6 +19,7 @@
 #include "Gyro_QMI8658.h"
 #include "step_counter.h"
 #include "activity_screen.h"
+#include "sd_logger.h"
 
 #define TP_SDA_PIN  1
 #define TP_SCL_PIN  3
@@ -27,6 +28,7 @@
 static volatile bool rtc_tick = false;
 
 static bool ntp_synced = false;
+static int  sd_save_tick = 0;
 
 struct WifiCredential {
   const char* ssid;
@@ -189,6 +191,13 @@ void setup() {
   setup_rtc_interrupt();
 
   StepCounter_Init();
+
+  if (SD_Logger_Init()) {
+    uint32_t saved_steps = 0;
+    SD_Logger_LoadSteps(&saved_steps);
+    StepCounter_SetSteps(saved_steps);
+  }
+
   StepCounter_StartTask();
 }
 
@@ -199,6 +208,11 @@ void loop() {
     PCF85063_Read_Time(&now);
     clock_screen_update();
     activity_screen_update();
+
+    if (++sd_save_tick >= 60) {
+      sd_save_tick = 0;
+      SD_Logger_SaveSteps(StepCounter_GetSteps());
+    }
   }
 
   Touch_Loop();
