@@ -5,8 +5,9 @@
 #include "Touch_CST816.h"  
 
 enum class Screen {
-  Home  = 0,
-  Clock = 1,
+  Home     = 0,
+  Clock    = 1,
+  Activity = 2,
   Count
 };
 

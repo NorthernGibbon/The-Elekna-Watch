@@ -1,13 +1,15 @@
 #include "ui_manager.h"
 #include "start_screen.h"
 #include "clock_screen.h"
+#include "activity_screen.h"
 
 static lv_obj_t * screens[int(Screen::Count)];
 static Screen      current = Screen::Home;
 
 void ui_init() {
-  screens[int(Screen::Home)]  = start_screen_create();
-  screens[int(Screen::Clock)] = clock_screen_create();
+  screens[int(Screen::Home)]     = start_screen_create();
+  screens[int(Screen::Clock)]    = clock_screen_create();
+  screens[int(Screen::Activity)] = activity_screen_create();
 
   current = Screen::Home;
   lv_scr_load(screens[int(current)]);

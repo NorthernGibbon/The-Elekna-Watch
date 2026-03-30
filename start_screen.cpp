@@ -6,6 +6,7 @@
 #include "BAT_Driver.h"
 #include "start_bg.h"
 #include "rtc_driver.h"
+#include "step_counter.h"
 
 // lv object creation for labels
 static lv_obj_t *wifi_lbl         = NULL;
@@ -16,6 +17,7 @@ static lv_obj_t *time_lbl         = NULL;
 static lv_obj_t *seperator_lbl    = NULL;
 static lv_obj_t *date_lbl         = NULL;
 static lv_obj_t *top_lbl          = NULL;
+static lv_obj_t *steps_lbl        = NULL;
 
 static lv_style_t *style_ble;
 
@@ -83,6 +85,17 @@ lv_obj_t * start_screen_create(void) {
   battery_lbl = lv_label_create(scr);
   lv_obj_add_style(battery_lbl, &bat_style, LV_PART_MAIN);
   lv_obj_align(battery_lbl, LV_ALIGN_LEFT_MID, 50, -5);
+
+  // Style and init of steps label
+  static lv_style_t steps_style;
+  lv_style_init(&steps_style);
+  lv_style_set_text_color(&steps_style, lv_color_white());
+  lv_style_set_text_font(&steps_style, &lv_font_montserrat_16);
+
+  steps_lbl = lv_label_create(scr);
+  lv_obj_add_style(steps_lbl, &steps_style, LV_PART_MAIN);
+  lv_label_set_text(steps_lbl, LV_SYMBOL_CHARGE " 0 steps");
+  lv_obj_align(steps_lbl, LV_ALIGN_LEFT_MID, 50, 20);
 
   // Style and init of ble label
   /*
@@ -172,11 +185,17 @@ void update_wifi_status_label() {
   }
 }
 
+static void update_steps_label(void) {
+    if (!steps_lbl) return;
+    lv_label_set_text_fmt(steps_lbl, LV_SYMBOL_CHARGE " %lu steps", StepCounter_GetSteps());
+}
+
 static void wifi_status_timer_cb(lv_timer_t * timer)
 {
   static int tick = 0;
   update_wifi_status_label();
   update_bluetooth_status_label();
+  update_steps_label();
   // Calls the update battery every 30 seconds instead to remove jitter in the ui
   if (++tick >= 30) {
     update_battery_label();

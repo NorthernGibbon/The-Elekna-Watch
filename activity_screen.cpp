@@ -62,7 +62,7 @@ lv_obj_t * activity_screen_create(void) {
     static lv_style_t count_style;
     lv_style_init(&count_style);
     lv_style_set_text_color(&count_style, lv_color_white());
-    lv_style_set_text_font(&count_style, &lv_font_montserrat_48);
+    lv_style_set_text_font(&count_style, &lv_font_montserrat_24);
 
     step_count_lbl = lv_label_create(scr);
     lv_obj_add_style(step_count_lbl, &count_style, 0);

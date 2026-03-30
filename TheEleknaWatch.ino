@@ -17,6 +17,8 @@
 #include "PWR_Key.h"
 #include "clock_screen.h"
 #include "Gyro_QMI8658.h"
+#include "step_counter.h"
+#include "activity_screen.h"
 
 #define TP_SDA_PIN  1
 #define TP_SCL_PIN  3
@@ -186,6 +188,8 @@ void setup() {
   PCF85063_Enable_1Hz_Timer();
   setup_rtc_interrupt();
 
+  StepCounter_Init();
+  StepCounter_StartTask();
 }
 
 void loop() {
@@ -194,6 +198,7 @@ void loop() {
     datetime_t now;
     PCF85063_Read_Time(&now);
     clock_screen_update();
+    activity_screen_update();
   }
 
   Touch_Loop();
