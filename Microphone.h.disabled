@@ -1,0 +1,17 @@
+#pragma once
+#include <Arduino.h>
+#include <driver/i2s_std.h>
+
+#define MIC_I2S_PORT    I2S_NUM_1
+#define MIC_PIN_WS      GPIO_NUM_2    // MIC_WS
+#define MIC_PIN_SCK     GPIO_NUM_15   // MIC_SCK
+#define MIC_PIN_SD      GPIO_NUM_39   // MIC_SD
+
+#define MIC_SAMPLE_RATE   16000
+#define MIC_BUFFER_FRAMES 256
+
+bool Mic_Init(void);
+void Mic_Deinit(void);
+
+// Returns the RMS amplitude of the last read — 0.0 to 1.0 normalised
+float Mic_GetLevel(void);

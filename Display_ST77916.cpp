@@ -252,10 +252,8 @@ int QSPI_Init(void){
     .intr_flags = 0,                            
   };
   if(spi_bus_initialize(ESP_PANEL_HOST_SPI_ID_DEFAULT, &host_config, SPI_DMA_CH_AUTO) != ESP_OK){
-    printf("The SPI initialization failed.\r\n");
     return 0;
   }
-  printf("The SPI initialization succeeded.\r\n");
   
   esp_lcd_panel_io_spi_config_t io_config ={
     .cs_gpio_num = ESP_PANEL_LCD_SPI_IO_CS,               
@@ -278,12 +276,8 @@ int QSPI_Init(void){
   };
   esp_lcd_panel_io_handle_t io_handle = NULL;
   if(esp_lcd_new_panel_io_spi((esp_lcd_spi_bus_handle_t)ESP_PANEL_HOST_SPI_ID_DEFAULT, &io_config, &io_handle) != ESP_OK){
-    printf("Failed to set LCD communication parameters -- SPI\r\n");
     return 0;
   }
-  printf("LCD communication parameters are set successfully -- SPI\r\n");
-
-  printf("Install LCD driver of st77916\r\n");
   st77916_vendor_config_t vendor_config={  
     .flags = {
       .use_qspi_interface = 1,
@@ -360,7 +354,6 @@ void ST77916_Init() {
 
 void LCD_addWindow(uint16_t Xstart, uint16_t Ystart, uint16_t Xend, uint16_t Yend, uint16_t* color)
 {
-    Serial.printf("LCD_addWindow: Area %dx%d\n", (Xend - Xstart + 1), (Yend - Ystart + 1));
 
     uint32_t size = (Xend - Xstart + 1) * (Yend - Ystart + 1);
 
@@ -380,7 +373,7 @@ void LCD_addWindow(uint16_t Xstart, uint16_t Ystart, uint16_t Xend, uint16_t Yen
 
 
 
-uint8_t LCD_Backlight = 50;
+uint8_t LCD_Backlight = 25;
 // backlight
 void Backlight_Init()
 {

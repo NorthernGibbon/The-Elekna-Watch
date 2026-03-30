@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -r GPIO_NUM /c/Users/Jacob/OneDrive/Dokument/TheEleknaWatch/*.h)",
+      "Bash(grep -h \"#define.*PIN\" /c/Users/Jacob/OneDrive/Dokument/TheEleknaWatch/*.h)",
+      "Bash(ls \"C:/Users/Jacob/OneDrive/Dokument/TheEleknaWatch\"/*.cpp \"C:/Users/Jacob/OneDrive/Dokument/TheEleknaWatch\"/*.h \"C:/Users/Jacob/OneDrive/Dokument/TheEleknaWatch\"/*.c)",
+      "Bash(mv step_counter.cpp step_counter.cpp.disabled)",
+      "Bash(mv step_counter.h step_counter.h.disabled)",
+      "Bash(mv activity_screen.cpp activity_screen.cpp.disabled)",
+      "Bash(mv activity_screen.h activity_screen.h.disabled)",
+      "Bash(ls C:/Users/Jacob/OneDrive/Dokument/TheEleknaWatch/*.cpp C:/Users/Jacob/OneDrive/Dokument/TheEleknaWatch/*.h C:/Users/Jacob/OneDrive/Dokument/TheEleknaWatch/*.c C:/Users/Jacob/OneDrive/Dokument/TheEleknaWatch/*.ino)",
+      "Bash(robocopy \"C:/Users/Jacob/OneDrive/Dokument/TheEleknaWatch\" \"E:/TheEleknaWatch\" /E /XD .git /IS /IT)",
+      "Bash(robocopy \"C:\\\\Users\\\\Jacob\\\\OneDrive\\\\Dokument\\\\TheEleknaWatch\" \"E:\\\\TheEleknaWatch\" /E /XD .git /IS /IT)",
+      "Bash(xcopy \"C:\\\\Users\\\\Jacob\\\\OneDrive\\\\Dokument\\\\TheEleknaWatch\\\\*\" \"E:\\\\TheEleknaWatch\"\" /E /Y /EXCLUDE:\"C:UsersJacobOneDriveDokumentTheEleknaWatch.git \")",
+      "Bash(powershell -Command \"Copy-Item -Path ''C:\\\\Users\\\\Jacob\\\\OneDrive\\\\Dokument\\\\TheEleknaWatch\\\\*'' -Destination ''E:\\\\TheEleknaWatch\\\\'' -Recurse -Force -Exclude ''.git''\")"
+    ]
+  }
+}

@@ -1,0 +1,69 @@
+#include "Microphone.h"
+#include <math.h>
+
+static i2s_chan_handle_t mic_rx_chan = NULL;
+
+bool Mic_Init(void) {
+    i2s_chan_config_t chan_cfg = I2S_CHANNEL_DEFAULT_CONFIG(MIC_I2S_PORT, I2S_ROLE_MASTER);
+    if (i2s_new_channel(&chan_cfg, NULL, &mic_rx_chan) != ESP_OK) {
+        Serial.println("Mic: failed to create I2S channel");
+        return false;
+    }
+
+    i2s_std_config_t std_cfg = {
+        .clk_cfg  = I2S_STD_CLK_DEFAULT_CONFIG(MIC_SAMPLE_RATE),
+        .slot_cfg = I2S_STD_MSB_SLOT_DEFAULT_CONFIG(I2S_DATA_BIT_WIDTH_16BIT, I2S_SLOT_MODE_MONO),
+        .gpio_cfg = {
+            .mclk = I2S_GPIO_UNUSED,
+            .bclk = MIC_PIN_SCK,
+            .ws   = MIC_PIN_WS,
+            .dout = I2S_GPIO_UNUSED,
+            .din  = MIC_PIN_SD,
+            .invert_flags = {
+                .mclk_inv = false,
+                .bclk_inv = false,
+                .ws_inv   = false,
+            },
+        },
+    };
+
+    if (i2s_channel_init_std_mode(mic_rx_chan, &std_cfg) != ESP_OK) {
+        Serial.println("Mic: failed to init I2S std mode");
+        return false;
+    }
+
+    if (i2s_channel_enable(mic_rx_chan) != ESP_OK) {
+        Serial.println("Mic: failed to enable channel");
+        return false;
+    }
+
+    Serial.println("Mic: initialized");
+    return true;
+}
+
+void Mic_Deinit(void) {
+    if (mic_rx_chan) {
+        i2s_channel_disable(mic_rx_chan);
+        i2s_del_channel(mic_rx_chan);
+        mic_rx_chan = NULL;
+    }
+}
+
+float Mic_GetLevel(void) {
+    if (!mic_rx_chan) return 0.0f;
+
+    int16_t buf[MIC_BUFFER_FRAMES];
+    size_t bytes_read = 0;
+    i2s_channel_read(mic_rx_chan, buf, sizeof(buf), &bytes_read, pdMS_TO_TICKS(50));
+
+    int samples = bytes_read / sizeof(int16_t);
+    if (samples == 0) return 0.0f;
+
+    float sum = 0.0f;
+    for (int i = 0; i < samples; i++) {
+        float s = buf[i] / 32768.0f;
+        sum += s * s;
+    }
+
+    return sqrtf(sum / samples);  // RMS, 0.0 – 1.0
+}

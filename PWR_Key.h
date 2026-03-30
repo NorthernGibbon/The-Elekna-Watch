@@ -15,3 +15,6 @@ void Restart(void);
 
 void PWR_Init(void);
 void PWR_Loop(void);
+
+void PWR_NotifyActivity(void);
+bool PWR_IsSleeping(void);

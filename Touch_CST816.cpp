@@ -1,6 +1,7 @@
 #include "Touch_CST816.h"
 #include "ui_manager.h"
 #include "esp_heap_caps.h"
+#include "PWR_Key.h"
 
 struct CST816_Touch touch_data = {0};
 uint8_t Touch_interrupts=0;
@@ -120,11 +121,11 @@ void example_touchpad_read(void) {
 void Touch_Loop(void) {
     if (Touch_interrupts) {
         Touch_interrupts = false;
+        PWR_NotifyActivity();
         example_touchpad_read();
 
         if (touch_data.gesture != NONE) {
-            printf("Gesture Detected: %s\r\n", Touch_GestureName().c_str());
-            ui_handle_gesture(touch_data.gesture);  // Switch screens
+            ui_handle_gesture(touch_data.gesture);
         }
     }
 }

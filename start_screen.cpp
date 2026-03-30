@@ -17,7 +17,6 @@ static lv_obj_t *seperator_lbl    = NULL;
 static lv_obj_t *date_lbl         = NULL;
 static lv_obj_t *top_lbl          = NULL;
 
-static lv_style_t *style_wifi;
 static lv_style_t *style_ble;
 
 lv_obj_t * start_screen_create(void) {
@@ -101,6 +100,20 @@ lv_obj_t * start_screen_create(void) {
   return scr;
 }
 
+static void update_battery_label(void) {
+    if(!battery_lbl) return;
+    float pct = BAT_Get_Percent();
+
+    const char* bat_sym;
+    if      (pct > 80) bat_sym = LV_SYMBOL_BATTERY_FULL;
+    else if (pct > 60) bat_sym = LV_SYMBOL_BATTERY_3;
+    else if (pct > 40) bat_sym = LV_SYMBOL_BATTERY_2;
+    else if (pct > 20) bat_sym = LV_SYMBOL_BATTERY_1;
+    else               bat_sym = LV_SYMBOL_BATTERY_EMPTY;
+
+    lv_label_set_text_fmt(battery_lbl, "%s // %3d%%", bat_sym, int(pct));
+}
+
 void update_bluetooth_status_label() {
     if (!ble_lbl) return;
     if (bluetooth_is_connected()) {
@@ -108,17 +121,6 @@ void update_bluetooth_status_label() {
     } else {
         lv_label_set_text_fmt(ble_lbl, "%s Not Connected", LV_SYMBOL_BLUETOOTH);
     }
-}
-
-static void update_battery_label(void) {
-    if(!battery_lbl) return;
-    int pct = (int)(BAT_Get_Percent() + 0.5f);
-    lv_label_set_text_fmt(
-      battery_lbl,
-      "%s // %d%%",
-      LV_SYMBOL_BATTERY_FULL,
-      pct
-    );
 }
 
 static void update_time_label(void) {
@@ -147,7 +149,6 @@ static void update_date_label(void) {
     );
 }
 
-
 void update_wifi_status_label() {
     if (!wifi_lbl) return;
 
@@ -173,11 +174,21 @@ void update_wifi_status_label() {
 
 static void wifi_status_timer_cb(lv_timer_t * timer)
 {
-    update_wifi_status_label();
-    update_bluetooth_status_label();
+  static int tick = 0;
+  update_wifi_status_label();
+  update_bluetooth_status_label();
+  // Calls the update battery every 30 seconds instead to remove jitter in the ui
+  if (++tick >= 30) {
     update_battery_label();
-    update_time_label();
-    update_date_label();
+    tick = 0;
+  }
+  update_time_label();
+  update_date_label();
+}
+
+void start_screen_enable_battery_auto_update()
+{
+    lv_timer_create([](lv_timer_t*){ update_battery_label(); }, 30000, NULL);
 }
 
 void start_screen_enable_wifi_auto_update()
