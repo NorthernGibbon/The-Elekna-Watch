@@ -126,6 +126,8 @@ void Touch_Loop(void) {
 
         if (touch_data.gesture != NONE) {
             ui_handle_gesture(touch_data.gesture);
+        } else if (touch_data.points > 0) {
+            ui_handle_tap(touch_data.x, touch_data.y);
         }
     }
 }

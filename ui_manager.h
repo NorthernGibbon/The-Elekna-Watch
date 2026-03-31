@@ -2,19 +2,19 @@
 #define UI_MANAGER_H
 
 #include <lvgl.h>
-#include "Touch_CST816.h"  
+#include "Touch_CST816.h"
 
 enum class Screen {
-  Home     = 0,
-  Clock    = 1,
-  Activity = 2,
+  Home      = 0,
+  Clock     = 1,
+  Activity  = 2,
+  Stopwatch = 3,
   Count
 };
 
 void ui_init();
-
 void ui_show(Screen s);
-
 void ui_handle_gesture(GESTURE g);
+void ui_handle_tap(int raw_x, int raw_y);
 
 #endif // UI_MANAGER_H

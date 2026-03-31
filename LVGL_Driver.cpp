@@ -47,18 +47,16 @@ void Lvgl_Display_LCD(lv_display_t * disp, const lv_area_t * area, uint8_t * px_
 
 void Lvgl_Touchpad_Read(lv_indev_t * indev, lv_indev_data_t * data)
 {
-    Touch_Read_Data();
+    // Use touch_data populated by Touch_Loop via the ISR — do NOT re-read
+    // from hardware here, as the CST816 clears its registers after one read.
     if (touch_data.points) {
-        int16_t x = touch_data.x;
-        int16_t y = touch_data.y;
-
-        data->point.x = HOR_RES - 1 - x;
-        data->point.y = VER_RES - 1 - y;
+        data->point.x = HOR_RES - 1 - touch_data.x;
+        data->point.y = VER_RES - 1 - touch_data.y;
         data->state   = LV_INDEV_STATE_PRESSED;
+        touch_data.points = 0;  // consume: next call reports RELEASED
     } else {
         data->state = LV_INDEV_STATE_RELEASED;
     }
-    memset(&touch_data, 0, sizeof(touch_data));
 }
 
 
@@ -107,6 +105,7 @@ void Lvgl_Init(void)
     lv_indev_t * indev = lv_indev_create();
     lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
     lv_indev_set_read_cb(indev, Lvgl_Touchpad_Read);
+    lv_timer_set_period(lv_indev_get_read_timer(indev), 5);  // read every ~10ms real time
 }
 
 void Lvgl_Loop(void)

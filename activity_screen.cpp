@@ -64,12 +64,12 @@ lv_obj_t * activity_screen_create(void) {
     lv_obj_t *title = lv_label_create(scr);
     lv_obj_add_style(title, &title_sty, 0);
     lv_label_set_text(title, "> ACTIVITY <");
-    lv_obj_align(title, LV_ALIGN_TOP_MID, 0, 20);
+    lv_obj_align(title, LV_ALIGN_TOP_MID, 0, 35);
 
     // ── Step arc (shifted up to leave room for chart) ────────
     step_arc = lv_arc_create(scr);
     lv_obj_set_size(step_arc, 160, 160);
-    lv_obj_align(step_arc, LV_ALIGN_CENTER, 0, -55);
+    lv_obj_align(step_arc, LV_ALIGN_CENTER, 0, -42);
     lv_arc_set_range(step_arc, 0, STEP_GOAL);
     lv_arc_set_value(step_arc, 0);
     lv_arc_set_bg_angles(step_arc, 140, 40);
@@ -94,7 +94,7 @@ lv_obj_t * activity_screen_create(void) {
     step_count_lbl = lv_label_create(scr);
     lv_obj_add_style(step_count_lbl, &count_sty, 0);
     lv_label_set_text(step_count_lbl, "00000");
-    lv_obj_align(step_count_lbl, LV_ALIGN_CENTER, 0, -65);
+    lv_obj_align(step_count_lbl, LV_ALIGN_CENTER, 0, -52);
 
     // ── Sub-labels ───────────────────────────────────────────
     static lv_style_t sub_sty;
@@ -105,7 +105,7 @@ lv_obj_t * activity_screen_create(void) {
     lv_obj_t *sub = lv_label_create(scr);
     lv_obj_add_style(sub, &sub_sty, 0);
     lv_label_set_text(sub, "STEPS TODAY");
-    lv_obj_align(sub, LV_ALIGN_CENTER, 0, -38);
+    lv_obj_align(sub, LV_ALIGN_CENTER, 0, -25);
 
     static lv_style_t goal_sty;
     lv_style_init(&goal_sty);
@@ -115,7 +115,7 @@ lv_obj_t * activity_screen_create(void) {
     step_goal_lbl = lv_label_create(scr);
     lv_obj_add_style(step_goal_lbl, &goal_sty, 0);
     lv_label_set_text(step_goal_lbl, "0% OF GOAL");
-    lv_obj_align(step_goal_lbl, LV_ALIGN_CENTER, 0, -20);
+    lv_obj_align(step_goal_lbl, LV_ALIGN_CENTER, 0, -7);
 
     // ── Divider ──────────────────────────────────────────────
     lv_obj_t *div = lv_obj_create(scr);
@@ -124,18 +124,18 @@ lv_obj_t * activity_screen_create(void) {
     lv_obj_set_style_bg_opa(div, LV_OPA_COVER, 0);
     lv_obj_set_style_border_width(div, 0, 0);
     lv_obj_set_style_pad_all(div, 0, 0);
-    lv_obj_align(div, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_align(div, LV_ALIGN_CENTER, 0, 13);
 
     // ── History label ────────────────────────────────────────
     lv_obj_t *hist_lbl = lv_label_create(scr);
     lv_obj_add_style(hist_lbl, &sub_sty, 0);
     lv_label_set_text(hist_lbl, "7 DAY HISTORY");
-    lv_obj_align(hist_lbl, LV_ALIGN_CENTER, 0, 16);
+    lv_obj_align(hist_lbl, LV_ALIGN_CENTER, 0, 29);
 
     // ── Bar chart ────────────────────────────────────────────
     hist_chart = lv_chart_create(scr);
     lv_obj_set_size(hist_chart, 220, 80);
-    lv_obj_align(hist_chart, LV_ALIGN_CENTER, 0, 68);
+    lv_obj_align(hist_chart, LV_ALIGN_CENTER, 0, 81);
     lv_chart_set_type(hist_chart, LV_CHART_TYPE_BAR);
     lv_chart_set_point_count(hist_chart, HIST_DAYS + 1);
     lv_chart_set_range(hist_chart, LV_CHART_AXIS_PRIMARY_Y, 0, STEP_GOAL);
